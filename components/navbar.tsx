@@ -3,10 +3,17 @@
 import { useState } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Menu, X, Heart, MapPin } from "lucide-react"
+import { Menu, X, Heart, MapPin, Shirt } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
+
+  const router = useRouter();
+
+  const handleBookingClick = (path:string) => {
+    router.push(path)
+  }
 
   const navigation = [
     { name: "Home", href: "/" },
@@ -16,7 +23,7 @@ export function Navbar() {
     { name: "Register", href: "/register" },
     { name: "Devotees", href: "/devotees" },
     { name: "Tasks", href: "/tasks" },
-    { name: "Donate", href: "/donate" },
+    //{ name: "Donate", href: "/donate" },
     { name: "Contact", href: "/contact" },
   ]
 
@@ -51,9 +58,20 @@ export function Navbar() {
                 <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-gradient-to-r from-orange-600 to-red-500 group-hover:w-full transition-all duration-300"></span>
               </Link>
             ))}
-            <Button className="bg-gradient-to-r from-orange-600 to-red-500 hover:from-red-500 hover:to-orange-600 shadow-lg transform hover:scale-105 transition-all duration-200">
+            <Button className="bg-gradient-to-r from-orange-600 to-red-500 hover:from-red-500 hover:to-orange-600 shadow-lg transform hover:scale-105 transition-all duration-200" 
+              onClick={() => handleBookingClick("/donate")}>
               <Heart className="mr-2 h-4 w-4" />
               Donate Now
+            </Button>
+            <Button
+              className="bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 hover:from-red-500 hover:to-yellow-400 shadow-lg transform hover:scale-110 transition-all duration-300 animate-pulse border-2 border-yellow-300"
+              style={{
+              boxShadow: "0 4px 20px 0 rgba(255,140,0,0.25)",
+              }}
+              onClick={() => handleBookingClick("/booking")}
+            >
+              <Shirt className="mr-2 h-4 w-4 text-yellow-300 animate-bounce" />
+              <span className="font-bold text-white drop-shadow-md">Book Now</span>
             </Button>
           </div>
 

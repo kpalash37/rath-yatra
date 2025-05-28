@@ -1,12 +1,18 @@
+'use client';
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Calendar, MapPin, Users, Heart, Play, Clock, ArrowRight, Sparkles } from "lucide-react"
+import { Calendar, MapPin, Users, Heart, Play, Clock, ArrowRight, Sparkles, MapIcon, Shirt } from "lucide-react"
 import Link from "next/link"
 import { CountdownTimer } from "@/components/countdown-timer"
 import { HeroSlider } from "@/components/hero-slider"
+import { useRouter } from "next/navigation"
 
 export default function HomePage() {
+  const router = useRouter()
+  const handleBookingClick = (path: string) => {
+    router.push(path)
+  }
   const upcomingEvents = [
     {
       title: "Snana Yatra",
@@ -224,7 +230,9 @@ export default function HomePage() {
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             <Card className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-orange-100 hover:border-orange-600 bg-gradient-to-b from-white to-orange-50/50">
               <CardHeader>
-                <CardTitle className="text-lg">Volunteer</CardTitle>
+                <CardTitle className="text-lg">
+                  <Users className="inline-block mr-1 h-5 w-5" />
+                  Volunteer</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">Help organize and serve during the festival</p>
@@ -232,6 +240,7 @@ export default function HomePage() {
                   variant="outline"
                   size="sm"
                   className="border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white"
+                  onClick={() => handleBookingClick("/devotees")}
                 >
                   Register Now
                 </Button>
@@ -240,7 +249,30 @@ export default function HomePage() {
 
             <Card className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-orange-100 hover:border-orange-600 bg-gradient-to-b from-white to-orange-50/50">
               <CardHeader>
-                <CardTitle className="text-lg">Donate</CardTitle>
+                <CardTitle className="text-lg">
+                  <Shirt className="inline-block mr-1 h-5 w-5" />
+                  T-Shirt</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <p className="text-gray-600 mb-4">
+                  Get your official Rath Yatra 2025 T-shirt to commemorate the festival
+                </p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white"
+                  onClick={() => handleBookingClick("/booking")}
+                >
+                  Book Now
+                </Button>
+              </CardContent>
+            </Card>
+
+            <Card className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-orange-100 hover:border-orange-600 bg-gradient-to-b from-white to-orange-50/50">
+              <CardHeader>
+                <CardTitle className="text-lg">
+                  <Heart className="inline-block mr-1 h-5 w-5" />
+                  Donate</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">Support prasadam and festival arrangements</p>
@@ -248,31 +280,18 @@ export default function HomePage() {
                   variant="outline"
                   size="sm"
                   className="border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white"
+                  onClick={() => handleBookingClick("/donate")}
                 >
                   Donate Now
                 </Button>
               </CardContent>
-            </Card>
+            </Card>            
 
             <Card className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-orange-100 hover:border-orange-600 bg-gradient-to-b from-white to-orange-50/50">
               <CardHeader>
-                <CardTitle className="text-lg">Live Stream</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">Watch the festival live from anywhere</p>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white"
-                >
-                  Watch Live
-                </Button>
-              </CardContent>
-            </Card>
-
-            <Card className="text-center hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2 border-2 border-orange-100 hover:border-orange-600 bg-gradient-to-b from-white to-orange-50/50">
-              <CardHeader>
-                <CardTitle className="text-lg">Route Map</CardTitle>
+                <CardTitle className="text-lg">
+                  <MapIcon className="inline-block mr-1 h-5 w-5" />
+                  Route Map</CardTitle>
               </CardHeader>
               <CardContent>
                 <p className="text-gray-600 mb-4">Plan your visit with interactive maps</p>
@@ -280,6 +299,7 @@ export default function HomePage() {
                   variant="outline"
                   size="sm"
                   className="border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white"
+                  onClick={() => handleBookingClick("/route")}
                 >
                   View Map
                 </Button>

@@ -9,6 +9,8 @@ const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Rath Yatra 2025 - Festival of Divine Chariots",
+  icons: {
+    icon: "🛕",},
   description:
     "Experience the sacred journey of Lord Jagannath, Balabhadra, and Subhadra in the most magnificent festival of chariots. Join millions of devotees in this divine celebration.",
   keywords: "Rath Yatra, Jagannath, Puri, Festival, Chariots, Hindu Festival, Devotion",
