@@ -12,6 +12,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import { UserPlus, Users, Heart, Shield } from "lucide-react"
+import { createDevotee } from "@/services/devotees.service"
+import { toast } from "react-toastify"
 
 export default function RegisterPage() {
   const [selectedRole, setSelectedRole] = useState<string>("")
@@ -96,10 +98,42 @@ export default function RegisterPage() {
     }))
   }
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    if (!selectedRole) {
+      toast.error("Please select a role before submitting the form.")
+      return
+    }
+    if (!formData.fullName || !formData.email || !formData.phone) {
+      toast.error("Please fill in all required fields.")
+      return
+    }
     console.log("Registration submitted:", { role: selectedRole, ...formData })
+
+    await createDevotee({ role: selectedRole, ...formData, createdAt: new Date().toISOString() });
+    toast.success("Registration successful! Thank you for joining us.")
+    setFormData({
+      fullName: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "St. John's",
+      state: "Newfoundland and Labrador",
+      pincode: "",
+      emergencyContact: "",
+      emergencyPhone: "",
+      skills: [],
+      availability: [],
+      experience: "",
+      motivation: "",
+      department: "",
+      adminLevel: "",
+      specialRequirements: "",
+      groupSize: "",
+      transportationNeeded: false,
     // Handle form submission
+    })
   }
 
   return (

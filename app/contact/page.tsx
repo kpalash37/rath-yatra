@@ -26,6 +26,8 @@ import {
   Instagram,
   Youtube,
 } from "lucide-react"
+import { createMessage } from "@/services/message.service"
+import { toast } from "react-toastify"
 
 export default function ContactPage() {
   const [formData, setFormData] = useState({
@@ -37,10 +39,21 @@ export default function ContactPage() {
     message: "",
   })
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     console.log("Contact form submitted:", formData)
-    // Handle form submission
+    await createMessage(formData) // Assuming createMessage is imported from your service file
+
+    toast.success("Your message has been sent successfully! We will get back to you shortly.");
+    setFormData({
+      name: "",
+      email: "",
+      phone: "",
+      subject: "",
+      category: "",
+      message: "",
+    })
+
   }
 
   const contactInfo = [
@@ -350,103 +363,7 @@ export default function ContactPage() {
             </Card>
           </div>
         </div>
-
-        {/* Department Contacts */}
-        <Card className="mb-12 border-orange-100">
-          <CardHeader>
-            <CardTitle className="text-2xl">Department Contacts</CardTitle>
-            <CardDescription>Contact specific departments for specialized assistance and information.</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {departments.map((dept, index) => (
-                <div key={index} className="p-4 border border-gray-200 rounded-lg hover:shadow-md transition-shadow">
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center">
-                      <dept.icon className="h-5 w-5 text-orange-600" />
-                    </div>
-                    <h3 className="font-semibold text-gray-900">{dept.title}</h3>
-                  </div>
-                  <p className="text-sm text-gray-600 mb-3">{dept.description}</p>
-                  <div className="space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Phone className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">{dept.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Mail className="h-4 w-4 text-gray-500" />
-                      <span className="text-sm">{dept.email}</span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Social Media and FAQ */}
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Social Media */}
-          <Card className="border-orange-100">
-            <CardHeader>
-              <CardTitle className="text-2xl">Follow Us</CardTitle>
-              <CardDescription>Stay connected with us on social media for updates and news.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-2 gap-4">
-                {socialMedia.map((social, index) => (
-                  <a
-                    key={index}
-                    href={social.url}
-                    className="flex items-center gap-3 p-4 border border-gray-200 rounded-lg hover:shadow-md transition-all hover:border-orange-300"
-                  >
-                    <social.icon className={`h-6 w-6 ${social.color}`} />
-                    <span className="font-medium">{social.name}</span>
-                  </a>
-                ))}
-              </div>
-
-              <Separator className="my-6" />
-
-              <div className="space-y-4">
-                <h3 className="font-semibold text-gray-900">Newsletter Signup</h3>
-                <p className="text-sm text-gray-600">
-                  Subscribe to our newsletter for the latest updates about Rath Yatra 2025.
-                </p>
-                <div className="flex gap-2">
-                  <Input placeholder="Enter your email" className="flex-1" />
-                  <Button className="bg-orange-600 hover:bg-orange-700">Subscribe</Button>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* FAQ */}
-          <Card className="border-orange-100">
-            <CardHeader>
-              <CardTitle className="text-2xl">Frequently Asked Questions</CardTitle>
-              <CardDescription>Quick answers to common questions about the festival.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {faqs.map((faq, index) => (
-                  <div key={index} className="border-b border-gray-200 pb-4 last:border-b-0">
-                    <h3 className="font-semibold text-gray-900 mb-2">{faq.question}</h3>
-                    <p className="text-sm text-gray-600">{faq.answer}</p>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-6 p-4 bg-orange-50 rounded-lg">
-                <p className="text-sm text-gray-700">
-                  <strong>Can't find what you're looking for?</strong>
-                  <br />
-                  Contact us directly and we'll be happy to help!
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+            
       </div>
     </div>
   )
