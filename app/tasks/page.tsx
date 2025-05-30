@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -17,111 +17,96 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { CheckCircle, Clock, AlertCircle, Plus, Users, Calendar, MapPin, Edit, Trash2, Search } from "lucide-react"
+import { CheckCircle, Clock, AlertCircle, Plus, Users, Calendar, MapPin, Edit, Trash2, Search, Phone } from "lucide-react"
+import { createTaskByAdmin, getTasks } from "@/services/task.service"
+import { ITask } from "@/lib/interfaces/task.interface"
+import { toast } from "react-toastify"
 
 export default function TasksPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterStatus, setFilterStatus] = useState("All Status")
   const [filterPriority, setFilterPriority] = useState("All Priorities")
-
+  const [tasks, setTasks] = useState<ITask[]>([])
+  const [filteredTasks, setFilteredTasks] = useState<ITask[]>([])
+  const [createTask, setcreateTask] = useState<ITask>({
+    title: "",
+    description: "",
+    category: "",
+    priority: "Low", // Default priority
+    status: "Pending", // Default status
+    startDate: new Date().toISOString().split("T")[0], // Default to today
+    endDate: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split("T")[0], // Default to 7 days later
+    location: "",
+    assignedPersons: [],
+    responsiblePerson: {
+      id: "",
+      name: "",
+      phone: "",
+      role: "",
+    },
+    progress: 0, // Default progress
+  })          
+  const [open, setOpen] = useState(false)
   // Mock data for tasks
-  const tasks = [
-    {
-      id: 1,
-      title: "Setup Main Stage",
-      description: "Construct and decorate the main stage for cultural performances",
-      category: "Infrastructure",
-      priority: "High",
-      status: "In Progress",
-      startDate: "2025-06-20",
-      endDate: "2025-06-25",
-      location: "Main Amphitheater, St. John's",
-      assignedPersons: [
-        { id: 1, name: "Ravi Krishnan", role: "Lead Coordinator", avatar: "/placeholder.svg?height=40&width=40" },
-        { id: 2, name: "Anita Gupta", role: "Assistant", avatar: "/placeholder.svg?height=40&width=40" },
-      ],
-      responsiblePerson: { id: 1, name: "Ravi Krishnan", role: "Lead Coordinator" },
-      progress: 65,
-      estimatedHours: 120,
-      actualHours: 78,
-    },
-    {
-      id: 2,
-      title: "Volunteer Training Program",
-      description: "Conduct comprehensive training for all registered volunteers",
-      category: "Training",
-      priority: "High",
-      status: "Pending",
-      startDate: "2025-06-15",
-      endDate: "2025-06-20",
-      location: "Community Hall, St. John's",
-      assignedPersons: [
-        { id: 3, name: "Kavita Mishra", role: "Training Manager", avatar: "/placeholder.svg?height=40&width=40" },
-        { id: 4, name: "Meera Joshi", role: "Assistant Trainer", avatar: "/placeholder.svg?height=40&width=40" },
-        { id: 5, name: "Amit Patel", role: "Logistics Support", avatar: "/placeholder.svg?height=40&width=40" },
-      ],
-      responsiblePerson: { id: 3, name: "Kavita Mishra", role: "Training Manager" },
-      progress: 0,
-      estimatedHours: 80,
-      actualHours: 0,
-    },
-    {
-      id: 3,
-      title: "Chariot Decoration",
-      description: "Decorate all three chariots with traditional flowers and ornaments",
-      category: "Decoration",
-      priority: "Medium",
-      status: "Completed",
-      startDate: "2025-06-10",
-      endDate: "2025-06-15",
-      location: "Temple Premises, St. John's",
-      assignedPersons: [
-        { id: 6, name: "Sunita Devi", role: "Decoration Lead", avatar: "/placeholder.svg?height=40&width=40" },
-        { id: 7, name: "Priya Sharma", role: "Assistant", avatar: "/placeholder.svg?height=40&width=40" },
-      ],
-      responsiblePerson: { id: 6, name: "Sunita Devi", role: "Decoration Lead" },
-      progress: 100,
-      estimatedHours: 60,
-      actualHours: 55,
-    },
-    {
-      id: 4,
-      title: "Security Coordination",
-      description: "Coordinate with local police and security agencies for crowd management",
-      category: "Security",
-      priority: "High",
-      status: "In Progress",
-      startDate: "2025-06-01",
-      endDate: "2025-07-10",
-      location: "Multiple Locations, St. John's",
-      assignedPersons: [
-        { id: 8, name: "Vikram Singh", role: "Security Chief", avatar: "/placeholder.svg?height=40&width=40" },
-      ],
-      responsiblePerson: { id: 8, name: "Vikram Singh", role: "Security Chief" },
-      progress: 40,
-      estimatedHours: 200,
-      actualHours: 80,
-    },
-    {
-      id: 5,
-      title: "Prasadam Distribution Setup",
-      description: "Setup distribution points and organize food preparation",
-      category: "Food Service",
-      priority: "Medium",
-      status: "Pending",
-      startDate: "2025-06-25",
-      endDate: "2025-06-28",
-      location: "Multiple Distribution Points, St. John's",
-      assignedPersons: [
-        { id: 9, name: "Rajesh Kumar", role: "Food Coordinator", avatar: "/placeholder.svg?height=40&width=40" },
-        { id: 10, name: "Anita Gupta", role: "Logistics Support", avatar: "/placeholder.svg?height=40&width=40" },
-      ],
-      responsiblePerson: { id: 9, name: "Rajesh Kumar", role: "Food Coordinator" },
-      progress: 0,
-      estimatedHours: 100,
-      actualHours: 0,
-    },
-  ]
+  
+
+  useEffect(() => {
+    // Fetch tasks from the service
+    const fetchTasks = async () => {
+      try {
+        const fetchedTasks = await getTasks();
+
+        console.log("Fetched tasks:", fetchedTasks);
+        setTasks(fetchedTasks);
+        setFilteredTasks(fetchedTasks);
+      } catch (error) {
+        toast.error("Failed to fetch tasks:" )
+      }
+    }
+    fetchTasks()
+  }, []);
+
+  const createTaskAction = async () => {
+    try {
+
+      if (!createTask.title || !createTask.description || !createTask.category) {
+        toast.error("Please fill in all required fields.");
+        return;
+      }
+      
+      await createTaskByAdmin(createTask);
+
+      setcreateTask({
+        title: "",
+        description: "",
+        category: "",
+        priority: "Low",
+        status: "Pending",
+        startDate: new Date().toISOString().split("T")[0],
+        endDate: new Date(new Date().setDate(new Date().getDate() + 7)).toISOString().split("T")[0],
+        location: "",
+        assignedPersons: [],
+        responsiblePerson: {
+          id: "",
+          name: "",
+          phone: "",
+          role: "",
+        },
+        progress: 0,
+      });
+      setSearchTerm("");
+      toast.success("Task created successfully!");
+      // Optionally, you can refetch tasks or update the state to include the new task
+      const fetchedTasks = await getTasks();
+      setTasks(fetchedTasks);
+      setFilteredTasks(fetchedTasks);
+      setOpen(false); // Close the dialog after creating the task
+      
+    } catch (error) {
+      console.error("Error creating task:", error);
+      toast.error("Failed to create task:");
+    }
+  }
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -164,15 +149,38 @@ export default function TasksPage() {
     }
   }
 
-  const filteredTasks = tasks.filter((task) => {
+  const filteredTasksAction = ()=>{
+    const filterTask = tasks.filter((task: ITask) => {
+
+    console.log("Filtering task:", task);
+    if(!task) return false; // Ensure task is defined
+
     const matchesSearch =
-      task.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      task.category.toLowerCase().includes(searchTerm.toLowerCase())
+      (task.title?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+      (task.description?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+      (task.category?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
     const matchesStatus = filterStatus === "All Status" || task.status === filterStatus
     const matchesPriority = filterPriority === "All Priorities" || task.priority === filterPriority
-    return matchesSearch && matchesStatus && matchesPriority
-  })
+    return task && matchesSearch && matchesStatus && matchesPriority
+  });
+
+    setFilteredTasks(filterTask);
+  
+}
+
+  // const filteredTasks1 = tasks.filter((task: ITask) => {
+
+  //   console.log("Filtering task:", task);
+  //   if(!task) return false; // Ensure task is defined
+
+  //   const matchesSearch =
+  //     (task.title?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+  //     (task.description?.toLowerCase().includes(searchTerm.toLowerCase()) || false) ||
+  //     (task.category?.toLowerCase().includes(searchTerm.toLowerCase()) || false)
+  //   const matchesStatus = filterStatus === "All Status" || task.status === filterStatus
+  //   const matchesPriority = filterPriority === "All Priorities" || task.priority === filterPriority
+  //   return task && matchesSearch && matchesStatus && matchesPriority
+  // })
 
   const taskStats = {
     total: tasks.length,
@@ -180,6 +188,8 @@ export default function TasksPage() {
     inProgress: tasks.filter((t) => t.status === "In Progress").length,
     pending: tasks.filter((t) => t.status === "Pending").length,
   }
+
+  
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -236,7 +246,7 @@ export default function TasksPage() {
                 <Search className="h-5 w-5" />
                 Search & Filter Tasks
               </CardTitle>
-              <Dialog>
+              <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>
                   <Button className="bg-orange-600 hover:bg-orange-700">
                     <Plus className="mr-2 h-4 w-4" />
@@ -248,66 +258,112 @@ export default function TasksPage() {
                     <DialogTitle>Create New Task</DialogTitle>
                     <DialogDescription>Add a new task and assign team members to it.</DialogDescription>
                   </DialogHeader>
-                  <div className="space-y-4">
+                    <div className="space-y-4">
                     <div>
                       <Label htmlFor="taskTitle">Task Title</Label>
-                      <Input id="taskTitle" placeholder="Enter task title" />
+                      <Input
+                      id="taskTitle"
+                      placeholder="Enter task title"
+                      value={createTask.title}
+                      onChange={(e) =>
+                        setcreateTask({ ...createTask, title: e.target.value })
+                      }
+                      />
                     </div>
                     <div>
                       <Label htmlFor="taskDescription">Description</Label>
-                      <Textarea id="taskDescription" placeholder="Describe the task..." />
+                      <Textarea
+                      id="taskDescription"
+                      placeholder="Describe the task..."
+                      value={createTask.description}
+                      onChange={(e) =>
+                        setcreateTask({ ...createTask, description: e.target.value })
+                      }
+                      />
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="category">Category</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select category" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="infrastructure">Infrastructure</SelectItem>
-                            <SelectItem value="decoration">Decoration</SelectItem>
-                            <SelectItem value="security">Security</SelectItem>
-                            <SelectItem value="food-service">Food Service</SelectItem>
-                            <SelectItem value="training">Training</SelectItem>
-                            <SelectItem value="logistics">Logistics</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <Label htmlFor="category">Category</Label>
+                      <Select
+                        value={createTask.category}
+                        onValueChange={(value) =>
+                        setcreateTask({ ...createTask, category: value })
+                        }
+                      >
+                        <SelectTrigger>
+                        <SelectValue placeholder="Select category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                        <SelectItem value="infrastructure">Infrastructure</SelectItem>
+                        <SelectItem value="decoration">Decoration</SelectItem>
+                        <SelectItem value="security">Security</SelectItem>
+                        <SelectItem value="food-service">Food Service</SelectItem>
+                        <SelectItem value="training">Training</SelectItem>
+                        <SelectItem value="logistics">Logistics</SelectItem>
+                        </SelectContent>
+                      </Select>
                       </div>
                       <div>
-                        <Label htmlFor="priority">Priority</Label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select priority" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="high">High</SelectItem>
-                            <SelectItem value="medium">Medium</SelectItem>
-                            <SelectItem value="low">Low</SelectItem>
-                          </SelectContent>
-                        </Select>
+                      <Label htmlFor="priority">Priority</Label>
+                      <Select
+                        value={createTask.priority}
+                        onValueChange={(value: "High" | "Medium" | "Low") =>
+                        setcreateTask({ ...createTask, priority: value })
+                        }
+                      >
+                        <SelectTrigger>
+                        <SelectValue placeholder="Select priority" />
+                        </SelectTrigger>
+                        <SelectContent>
+                        <SelectItem value="High">High</SelectItem>
+                        <SelectItem value="Medium">Medium</SelectItem>
+                        <SelectItem value="Low">Low</SelectItem>
+                        </SelectContent>
+                      </Select>
                       </div>
                     </div>
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <Label htmlFor="startDate">Start Date</Label>
-                        <Input id="startDate" type="date" />
+                      <Label htmlFor="startDate">Start Date</Label>
+                      <Input
+                        id="startDate"
+                        type="date"
+                        value={createTask.startDate}
+                        onChange={(e) =>
+                        setcreateTask({ ...createTask, startDate: e.target.value })
+                        }
+                      />
                       </div>
                       <div>
-                        <Label htmlFor="endDate">End Date</Label>
-                        <Input id="endDate" type="date" />
+                      <Label htmlFor="endDate">End Date</Label>
+                      <Input
+                        id="endDate"
+                        type="date"
+                        value={createTask.endDate}
+                        onChange={(e) =>
+                        setcreateTask({ ...createTask, endDate: e.target.value })
+                        }
+                      />
                       </div>
                     </div>
                     <div>
                       <Label htmlFor="location">Location</Label>
-                      <Input id="location" placeholder="Task location" />
+                      <Input
+                      id="location"
+                      placeholder="Task location"
+                      value={createTask.location}
+                      onChange={(e) =>
+                        setcreateTask({ ...createTask, location: e.target.value })
+                      }
+                      />
                     </div>
-                    <div>
-                      <Label htmlFor="estimatedHours">Estimated Hours</Label>
-                      <Input id="estimatedHours" type="number" placeholder="Estimated hours to complete" />
+                    <Button
+                      className="w-full bg-orange-600 hover:bg-orange-700"
+                      onClick={createTaskAction}
+                    >
+                      Create Task
+                    </Button>
                     </div>
-                    <Button className="w-full bg-orange-600 hover:bg-orange-700">Create Task</Button>
-                  </div>
                 </DialogContent>
               </Dialog>
             </div>
@@ -348,8 +404,9 @@ export default function TasksPage() {
                 </Select>
               </div>
               <div>
-                <Button variant="outline" className="w-full">
-                  Export Tasks
+                <Button variant="outline" className="w-full bg-orange-600 text-white hover:bg-orange-700" onClick={filteredTasksAction}>
+                  <Search className="mr-2 h-4 w-4" />
+                  Search
                 </Button>
               </div>
             </div>
@@ -400,16 +457,7 @@ export default function TasksPage() {
                         <p className="text-sm font-medium">Location</p>
                         <p className="text-sm text-gray-600">{task.location}</p>
                       </div>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-orange-600" />
-                      <div>
-                        <p className="text-sm font-medium">Hours</p>
-                        <p className="text-sm text-gray-600">
-                          {task.actualHours}/{task.estimatedHours}h
-                        </p>
-                      </div>
-                    </div>
+                    </div>                    
                     <div>
                       <p className="text-sm font-medium mb-1">Progress</p>
                       <div className="w-full bg-gray-200 rounded-full h-2">
@@ -429,15 +477,15 @@ export default function TasksPage() {
                       <Avatar className="h-10 w-10">
                         <AvatarImage src="/placeholder.svg?height=40&width=40" />
                         <AvatarFallback>
-                          {task.responsiblePerson.name
+                          {task?.responsiblePerson?.name
                             .split(" ")
                             .map((n) => n[0])
                             .join("")}
                         </AvatarFallback>
                       </Avatar>
                       <div>
-                        <p className="font-medium">{task.responsiblePerson.name}</p>
-                        <p className="text-sm text-gray-600">{task.responsiblePerson.role}</p>
+                        <p className="font-medium">{task?.responsiblePerson?.name}</p>
+                        <p className="text-sm text-gray-600">{task?.responsiblePerson?.role}</p>
                       </div>
                       <Badge className="ml-auto bg-orange-100 text-orange-800">Lead</Badge>
                     </div>
@@ -445,9 +493,9 @@ export default function TasksPage() {
 
                   {/* Assigned Team */}
                   <div>
-                    <p className="text-sm font-medium mb-3">Assigned Team ({task.assignedPersons.length} members)</p>
+                    <p className="text-sm font-medium mb-3">Assigned Team ({task?.assignedPersons?.length} members)</p>
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-3">
-                      {task.assignedPersons.map((person) => (
+                      {(task.assignedPersons||[]).map((person) => (
                         <div key={person.id} className="flex items-center gap-3 p-3 border border-gray-200 rounded-lg">
                           <Avatar className="h-8 w-8">
                             <AvatarImage src={person.avatar || "/placeholder.svg"} />

@@ -380,42 +380,7 @@ export default function RegisterPage() {
 
                   {selectedRole === "admin" && (
                     <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-gray-900">Admin Information</h3>
-
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                          <Label htmlFor="department">Department</Label>
-                          <Select onValueChange={(value) => setFormData((prev) => ({ ...prev, department: value }))}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select department" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="operations">Operations</SelectItem>
-                              <SelectItem value="security">Security</SelectItem>
-                              <SelectItem value="logistics">Logistics</SelectItem>
-                              <SelectItem value="media">Media & Communications</SelectItem>
-                              <SelectItem value="volunteers">Volunteer Management</SelectItem>
-                              <SelectItem value="finance">Finance</SelectItem>
-                              <SelectItem value="cultural">Cultural Events</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <div>
-                          <Label htmlFor="adminLevel">Admin Level</Label>
-                          <Select onValueChange={(value) => setFormData((prev) => ({ ...prev, adminLevel: value }))}>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select admin level" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="coordinator">Coordinator</SelectItem>
-                              <SelectItem value="manager">Manager</SelectItem>
-                              <SelectItem value="director">Director</SelectItem>
-                              <SelectItem value="super-admin">Super Admin</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                      </div>
-
+                      <h3 className="text-lg font-semibold text-gray-900">Admin Information</h3>                     
                       <div>
                         <Label htmlFor="experience">Administrative Experience</Label>
                         <Textarea

@@ -34,9 +34,16 @@ export async function getDevoteeByPhone(phone: string): Promise<IDevotee[] | nul
     return matched.length > 0 ? matched : null;
 }
 
-export async function readDevotees(): Promise<IDevotee[]> {
+export async function getDevotees(): Promise<IDevotee[]> {
   const dbRef = ref(database);
   const snapshot = await get(child(dbRef, USERS_PATH));
   const data = snapshot.val();
-  return data ? Object.values(data) : [];
+  //return data ? Object.values(data) : [];
+
+  return data
+    ? Object.entries(data).map(([id, value]) => ({
+        id,
+        ...(value as any),
+      }))
+    : [];
 }

@@ -1,4 +1,5 @@
 export interface IDevotee {
+    id?: string; // Optional, will be assigned by Firebase
     fullName: string;
     email: string;
     phone: string;

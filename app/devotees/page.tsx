@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -8,145 +8,34 @@ import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Search, Download, Users, MapPin, Phone, Mail, Calendar, Heart } from "lucide-react"
+import { getDevotees } from "@/services/devotees.service"
+import { IDevotee } from "@/lib/interfaces/devotees.interface"
 
 export default function DevoteesPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterCity, setFilterCity] = useState("All Cities")
   const [filterState, setFilterState] = useState("All States")
+  const [devotees, setDevotees] = useState<IDevotee[]>([])
+  const [volunteers, setVolunteers] = useState<IDevotee[]>([])
+  const [admins, setAdmins] = useState<IDevotee[]>([])
 
-  // Mock data for devotees
-  const devotees = [
-    {
-      id: 1,
-      name: "Rajesh Kumar",
-      email: "rajesh.kumar@email.com",
-      phone: "+1 (709) 555-0123",
-      city: "St. John's",
-      state: "Newfoundland and Labrador",
-      groupSize: "2-5",
-      registrationDate: "2025-01-15",
-      transportationNeeded: false,
-      specialRequirements: "Vegetarian meals only",
-    },
-    {
-      id: 2,
-      name: "Priya Sharma",
-      email: "priya.sharma@email.com",
-      phone: "+1 (709) 555-0124",
-      city: "St. John's",
-      state: "Newfoundland and Labrador",
-      groupSize: "Individual",
-      registrationDate: "2025-01-20",
-      transportationNeeded: true,
-      specialRequirements: "Wheelchair accessibility required",
-    },
-    {
-      id: 3,
-      name: "Amit Patel",
-      email: "amit.patel@email.com",
-      phone: "+1 (709) 555-0125",
-      city: "St. John's",
-      state: "Newfoundland and Labrador",
-      groupSize: "6-10",
-      registrationDate: "2025-01-18",
-      transportationNeeded: true,
-      specialRequirements: "Family with elderly members",
-    },
-    {
-      id: 4,
-      name: "Sunita Devi",
-      email: "sunita.devi@email.com",
-      phone: "+1 (709) 555-0126",
-      city: "St. John's",
-      state: "Newfoundland and Labrador",
-      groupSize: "11-20",
-      registrationDate: "2025-01-22",
-      transportationNeeded: false,
-      specialRequirements: "Group accommodation preferred",
-    },
-    {
-      id: 5,
-      name: "Vikram Singh",
-      email: "vikram.singh@email.com",
-      phone: "+1 (709) 555-0127",
-      city: "St. John's",
-      state: "Newfoundland and Labrador",
-      groupSize: "2-5",
-      registrationDate: "2025-01-25",
-      transportationNeeded: false,
-      specialRequirements: "None",
-    },
-  ]
+  useEffect(() => {
+    // Reset filters when search term changes
+    const getData = async () => {
+      const data = await getDevotees();
+      setVolunteers(data.filter((d) => d.role === "volunteer"));
+      setAdmins(data.filter((d) => d.role === "admin"));
+      setDevotees(data.filter((d) => d.role === "devotee"));
+      console.log("Fetched devotees:", data);
+    }
 
-  const volunteers = [
-    {
-      id: 1,
-      name: "Anita Gupta",
-      email: "anita.gupta@email.com",
-      phone: "+1 (709) 555-0128",
-      city: "St. John's",
-      state: "Newfoundland and Labrador",
-      skills: ["Crowd Management", "First Aid", "Translation"],
-      availability: ["Morning (9 AM - 1 PM)", "Afternoon (1 PM - 5 PM)"],
-      experience: "5 years of event management",
-      registrationDate: "2025-01-10",
-    },
-    {
-      id: 2,
-      name: "Ravi Krishnan",
-      email: "ravi.krishnan@email.com",
-      phone: "+1 (709) 555-0129",
-      city: "St. John's",
-      state: "Newfoundland and Labrador",
-      skills: ["Photography", "Sound System", "Event Coordination"],
-      availability: ["Full Day"],
-      experience: "Professional photographer and event coordinator",
-      registrationDate: "2025-01-12",
-    },
-    {
-      id: 3,
-      name: "Meera Joshi",
-      email: "meera.joshi@email.com",
-      phone: "+1 (709) 555-0130",
-      city: "St. John's",
-      state: "Newfoundland and Labrador",
-      skills: ["Food Service", "Decoration", "Translation"],
-      availability: ["Early Morning (5 AM - 9 AM)", "Evening (5 PM - 9 PM)"],
-      experience: "Community service volunteer for 3 years",
-      registrationDate: "2025-01-14",
-    },
-  ]
+    getData();
+  }, [])
 
-  const admins = [
-    {
-      id: 1,
-      name: "Dr. Suresh Panda",
-      email: "suresh.panda@rathyatra.org",
-      phone: "+1 (709) 555-0131",
-      city: "St. John's",
-      state: "Newfoundland and Labrador",
-      department: "Operations",
-      adminLevel: "Director",
-      experience: "20+ years in festival management",
-      registrationDate: "2025-01-05",
-    },
-    {
-      id: 2,
-      name: "Kavita Mishra",
-      email: "kavita.mishra@rathyatra.org",
-      phone: "+1 (709) 555-0132",
-      city: "St. John's",
-      state: "Newfoundland and Labrador",
-      department: "Volunteer Management",
-      adminLevel: "Manager",
-      experience: "10 years in volunteer coordination",
-      registrationDate: "2025-01-08",
-    },
-  ]
-
+  
   const filteredDevotees = devotees.filter((devotee) => {
     const matchesSearch =
-      devotee.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      devotee.fullName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       devotee.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
       devotee.phone.includes(searchTerm)
     const matchesCity = filterCity === "All Cities" || devotee.city === filterCity
@@ -273,7 +162,7 @@ export default function DevoteesPage() {
                   <CardHeader>
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                       <div>
-                        <CardTitle className="text-xl">{devotee.name}</CardTitle>
+                        <CardTitle className="text-xl">{devotee.fullName}</CardTitle>
                         <CardDescription className="flex items-center gap-4 mt-2">
                           <span className="flex items-center gap-1">
                             <Mail className="h-4 w-4" />
@@ -289,7 +178,7 @@ export default function DevoteesPage() {
                         <Badge className="bg-orange-100 text-orange-800">Group: {devotee.groupSize}</Badge>
                         <Badge variant="outline">
                           <Calendar className="h-3 w-3 mr-1" />
-                          {devotee.registrationDate}
+                          {devotee.createdAt.split("T")[0]}
                         </Badge>
                       </div>
                     </div>
@@ -299,7 +188,7 @@ export default function DevoteesPage() {
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-orange-600" />
                         <span className="text-sm">
-                          {devotee.city}, {devotee.state}
+                         {devotee.address}, {devotee.city}, {devotee.state}
                         </span>
                       </div>
                       <div className="flex items-center gap-2">
@@ -308,13 +197,6 @@ export default function DevoteesPage() {
                         </Badge>
                       </div>
                     </div>
-                    {devotee.specialRequirements && devotee.specialRequirements !== "None" && (
-                      <div className="mt-3 p-3 bg-yellow-50 rounded-lg">
-                        <p className="text-sm">
-                          <strong>Special Requirements:</strong> {devotee.specialRequirements}
-                        </p>
-                      </div>
-                    )}
                   </CardContent>
                 </Card>
               ))}
@@ -328,7 +210,7 @@ export default function DevoteesPage() {
                   <CardHeader>
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                       <div>
-                        <CardTitle className="text-xl">{volunteer.name}</CardTitle>
+                        <CardTitle className="text-xl">{volunteer.fullName}</CardTitle>
                         <CardDescription className="flex items-center gap-4 mt-2">
                           <span className="flex items-center gap-1">
                             <Mail className="h-4 w-4" />
@@ -342,7 +224,7 @@ export default function DevoteesPage() {
                       </div>
                       <Badge variant="outline">
                         <Calendar className="h-3 w-3 mr-1" />
-                        {volunteer.registrationDate}
+                        {volunteer.createdAt.split("T")[0]}
                       </Badge>
                     </div>
                   </CardHeader>
@@ -351,7 +233,7 @@ export default function DevoteesPage() {
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-blue-600" />
                         <span className="text-sm">
-                          {volunteer.city}, {volunteer.state}
+                          {volunteer.address}, {volunteer.city}, {volunteer.state}
                         </span>
                       </div>
 
@@ -396,7 +278,7 @@ export default function DevoteesPage() {
                   <CardHeader>
                     <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                       <div>
-                        <CardTitle className="text-xl">{admin.name}</CardTitle>
+                        <CardTitle className="text-xl">{admin.fullName}</CardTitle>
                         <CardDescription className="flex items-center gap-4 mt-2">
                           <span className="flex items-center gap-1">
                             <Mail className="h-4 w-4" />
@@ -412,7 +294,7 @@ export default function DevoteesPage() {
                         <Badge className="bg-purple-100 text-purple-800">{admin.adminLevel}</Badge>
                         <Badge variant="outline">
                           <Calendar className="h-3 w-3 mr-1" />
-                          {admin.registrationDate}
+                          {admin.createdAt.split("T")[0]}
                         </Badge>
                       </div>
                     </div>
@@ -423,12 +305,9 @@ export default function DevoteesPage() {
                         <div className="flex items-center gap-2">
                           <MapPin className="h-4 w-4 text-purple-600" />
                           <span className="text-sm">
-                            {admin.city}, {admin.state}
+                           {admin.address}, {admin.city}, {admin.state}
                           </span>
-                        </div>
-                        <div>
-                          <Badge className="bg-purple-100 text-purple-800">Department: {admin.department}</Badge>
-                        </div>
+                        </div>                       
                       </div>
 
                       <div className="p-3 bg-purple-50 rounded-lg">

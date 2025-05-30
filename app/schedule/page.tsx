@@ -1,84 +1,58 @@
+'use client'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Clock, MapPin, Users, Calendar, Plus } from "lucide-react"
+import { createEvents, getEvents } from "@/services/events.service"
+import { useEffect, useState } from "react"
+import { IEvents } from "@/lib/interfaces/events.interface"
 
 export default function SchedulePage() {
-  const events = {
-    religious: [
-      {
-        title: "Snana Yatra",
-        date: "June 14, 2025",
-        time: "6:00 AM - 12:00 PM",
-        location: "Jagannath Temple",
-        description: "Sacred bathing ceremony of the deities",
-        attendees: "50,000+",
-      },
-      {
-        title: "Rath Yatra Begins",
-        date: "June 28, 2025",
-        time: "7:00 AM - 6:00 PM",
-        location: "Temple to Gundicha",
-        description: "Grand chariot procession starts",
-        attendees: "2,000,000+",
-      },
-      {
-        title: "Bahuda Yatra",
-        date: "July 6, 2025",
-        time: "8:00 AM - 7:00 PM",
-        location: "Gundicha to Temple",
-        description: "Return journey of the chariots",
-        attendees: "1,500,000+",
-      },
-    ],
-    cultural: [
-      {
-        title: "Classical Dance Performance",
-        date: "June 27, 2025",
-        time: "7:00 PM - 9:00 PM",
-        location: "Cultural Stage",
-        description: "Odissi and Bharatanatyam performances",
-        attendees: "5,000+",
-      },
-      {
-        title: "Devotional Music Concert",
-        date: "June 29, 2025",
-        time: "6:00 PM - 10:00 PM",
-        location: "Main Amphitheater",
-        description: "Bhajans and kirtans by renowned artists",
-        attendees: "10,000+",
-      },
-    ],
-    food: [
-      {
-        title: "Mahaprasadam Distribution",
-        date: "June 28 - July 6, 2025",
-        time: "12:00 PM - 3:00 PM Daily",
-        location: "Multiple Distribution Points",
-        description: "Free sacred food for all devotees",
-        attendees: "500,000+ daily",
-      },
-      {
-        title: "Community Feast",
-        date: "July 1, 2025",
-        time: "1:00 PM - 4:00 PM",
-        location: "Community Hall",
-        description: "Traditional Odia cuisine for all",
-        attendees: "25,000+",
-      },
-    ],
+
+   const [events, setEvents] = useState<IEvents>();
+
+  const saveData = async () => {
+    console.log("Saving data...");
+    // Here you would implement the logic to save the data, e.g., to a database or local storage
+   // alert("Data saved successfully!");    
   }
 
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const fetchedEvents = await getEvents();
+        console.log("Fetched events:", fetchedEvents);
+        console.log("Fetched events 2:", fetchedEvents[0]);
+        setEvents(Array.isArray(fetchedEvents) ? fetchedEvents[0] : fetchedEvents || {
+          religious: [],
+          cultural: [],
+          food: []
+        });
+
+        Object.entries(fetchedEvents[0]).forEach(([category, categoryEvents]) => {
+          console.log(`Category: ${category}`);
+          console.log("Events in category:", categoryEvents);
+        });
+      } catch (error) {
+        console.error("Error fetching events:", error);
+        setEvents(undefined);
+      }
+    };
+    fetchEvents();
+  }, []);
+
+
+  
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen bg-gray-50 py-8">      
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
           <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">Festival Schedule</h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Complete timeline of all religious ceremonies, cultural events, and community activities during the 9-day
             Rath Yatra festival.
-          </p>
+          </p>         
         </div>
 
         <Tabs defaultValue="religious" className="w-full">
@@ -88,10 +62,10 @@ export default function SchedulePage() {
             <TabsTrigger value="food">Food & Prasadam</TabsTrigger>
           </TabsList>
 
-          {Object.entries(events).map(([category, categoryEvents]) => (
+          {events && Object.entries(events).map(([category, categoryEvents]) => (
             <TabsContent key={category} value={category}>
               <div className="grid gap-6">
-                {categoryEvents.map((event, index) => (
+                {categoryEvents && categoryEvents.map((event:any, index: any) => (
                   <Card key={index} className="hover:shadow-lg transition-shadow border-orange-100">
                     <CardHeader>
                       <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
@@ -127,13 +101,7 @@ export default function SchedulePage() {
                             <p className="text-sm text-gray-600">Location</p>
                           </div>
                         </div>
-                        <div className="flex items-center gap-2">
-                          <Users className="h-5 w-5 text-orange-600" />
-                          <div>
-                            <p className="font-medium text-gray-900">{event.attendees}</p>
-                            <p className="text-sm text-gray-600">Expected</p>
-                          </div>
-                        </div>
+                        
                       </div>
                       <div className="flex gap-3">
                         <Button className="bg-orange-600 hover:bg-orange-700">
