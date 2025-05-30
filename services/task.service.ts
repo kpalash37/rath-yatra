@@ -1,6 +1,6 @@
 // services/user-service.ts
 import { database } from '@/lib/firebase';
-import { ITask } from '@/lib/interfaces/task.interface';
+import { IPerson, ITask } from '@/lib/interfaces/task.interface';
 import { ref, push, set, get, child } from 'firebase/database';
 import { toast } from 'react-toastify';
 
@@ -48,18 +48,63 @@ export async function createTaskByAdmin(task: ITask): Promise<void> {
 }
 
 
+export async function addPersonToTaskService(taskId: string, person: IPerson): Promise<void> {
+  try {
+    // Fetch current assignedPersons array
+    const assignedPersonsRef = ref(database, `${USERS_PATH}${taskId}/assignedPersons`);
+    const snapshot = await get(assignedPersonsRef);
+    const current = snapshot.exists() ? snapshot.val() : [];
+    // If current is an array, push; if it's an object (from push), convert to array
+    let assignedPersonsArr: IPerson[] = [];
+    if (Array.isArray(current)) {
+      assignedPersonsArr = [...current, person];
+    } else if (current && typeof current === 'object') {
+      assignedPersonsArr = [...(Object.values(current) as IPerson[]), person];
+    } else {
+      assignedPersonsArr = [person];
+    }
+    await set(assignedPersonsRef, assignedPersonsArr);
+    toast.success("Person added to task successfully");
+  } catch (error) {
+    toast.error("Error adding person to task");
+    throw new Error("Failed to add person to task");
+  }
+} 
+
+export async function deletePersonFromTaskService(taskId: string, personName: string): Promise<void> {
+  try { 
+    // Fetch current assignedPersons array
+    const assignedPersonsRef = ref(database, `${USERS_PATH}${taskId}/assignedPersons`);
+    const snapshot = await get(assignedPersonsRef);
+    const current = snapshot.exists() ? snapshot.val() : [];
+    
+    // If current is an array, filter out the person; if it's an object, convert to array first
+    let assignedPersonsArr: IPerson[] = [];
+    if (Array.isArray(current)) {
+      assignedPersonsArr = current.filter((person: IPerson) => person.name !== personName);
+    } else if (current && typeof current === 'object') {
+      assignedPersonsArr = (Object.values(current) as IPerson[]).filter((person: IPerson) => person.name !== personName);
+    }
+    
+    await set(assignedPersonsRef, assignedPersonsArr);
+    toast.success("Person removed from task successfully");
+  } catch (error) {
+    toast.error("Error removing person from task");   
+  }
+}
+
 export async function getTasks(): Promise<ITask[]> {
   const dbRef = ref(database);
   const snapshot = await get(child(dbRef, USERS_PATH));
   const data = snapshot.val();
-  return data ? Object.values(data) : [];
+  //return data ? Object.values(data) : [];
 
-  // return data
-  //   ? Object.entries(data).map(([id, value]) => ({
-  //       id,
-  //       ...(value as any),
-  //     }))
-  //   : [];
+  return data
+    ? Object.entries(data).map(([id, value]) => ({
+        id,
+        ...(value as any),
+      }))
+    : [];
 }
 
 

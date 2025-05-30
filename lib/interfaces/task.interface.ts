@@ -1,4 +1,4 @@
-export interface Person {
+export interface IPerson {
     id?: string;
     name: string;
     phone: string;
@@ -23,7 +23,7 @@ export interface ITask {
     startDate: string; // ISO date string
     endDate: string;   // ISO date string
     location: string;
-    assignedPersons: Person[];
+    assignedPersons: IPerson[];
     responsiblePerson: ResponsiblePerson;
     progress: number; // 0-100
 }
