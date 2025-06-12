@@ -7,6 +7,11 @@ import { Button } from "@/components/ui/button"
 
 const slides = [
   {
+    image: "/images/banner 1.png",
+    title: "The Sacred Three Chariots",
+    description: "Lord Jagannath, Balabhadra, and Subhadra in their divine chariots",
+  },
+  {
     image: "/images/rath-yatra-chariots.jpg",
     title: "The Sacred Three Chariots",
     description: "Lord Jagannath, Balabhadra, and Subhadra in their divine chariots",

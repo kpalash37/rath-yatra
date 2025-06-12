@@ -27,6 +27,7 @@ type Size = "S" | "M" | "L" | "XL";
 const availableSizes: Size[] = ["S", "M", "L", "XL"];
 
 export default function Page() {
+  const [showEmail, setShowEmail] = useState(false);
   const [selectedSize, setSelectedSize] = useState<Size>("M");
   const [searchPhone, setSearchPhone] = useState("");
   const [bookings, setBookings] = useState([] as IBooking[]);
@@ -42,7 +43,7 @@ export default function Page() {
     size: "M",
     quantity: 1,
     notes: "",
-    price: 10.5,
+    price: 11.0,
     paymentStatus: "pending",
     deliveryStatus: "pending",
     createdAt: new Date().toISOString(),
@@ -309,27 +310,50 @@ export default function Page() {
               </Card>
 
               <Card className="border-2 border-orange-100 hover:border-orange-600 transition-all duration-300 shadow-xl bg-gradient-to-b from-white to-orange-50/30">
-                <CardHeader>
-                  <CardTitle className="text-xl flex items-center gap-2">
-                    <Star className="h-5 w-5 text-orange-600" />
-                    QR code for payment
-                  </CardTitle>
-                  <CardDescription>
-                    Scan the QR code to make your payment securely and easily.
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-center py-8">
-                    <img
-                      src="/images/qr-code.png"
-                      alt="QR Code for Payment"
-                      className="w-48 h-48 object-contain mx-auto rounded shadow cursor-pointer border border-orange-200 hover:border-orange-600"
-                      onClick={() => setModalImg("/images/qr-code.png")}
-                    />
-                    <p className="text-sm text-gray-600 mt-4">Scan to pay</p>
-                  </div>
-                </CardContent>
-              </Card>
+              <CardHeader>
+                <CardTitle className="text-xl flex items-center gap-2">
+                  <Star className="h-5 w-5 text-orange-600" />
+                  E-Transfer Details
+                </CardTitle>
+                <CardDescription>
+                  You can e-transfer your payment securely.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="text-center py-8">
+                  <Button
+                    variant="outline"
+                    className="border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white transition-all duration-200"
+                    onClick={() => setShowEmail((prev) => !prev)}
+                  >
+                    {showEmail ? "Hide E-Transfer Email" : "Show E-Transfer Email"}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    aria-label="Copy E-Transfer Email"
+                    className="hover:bg-orange-100 ml-2"
+                    onClick={() => {
+                      navigator.clipboard.writeText("palash.kuet@gmail.com");
+                      toast.success("E-Transfer email copied!");
+                    }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <rect x="9" y="9" width="13" height="13" rx="2" strokeWidth="2" stroke="currentColor" fill="none"/>
+                      <rect x="3" y="3" width="13" height="13" rx="2" strokeWidth="2" stroke="currentColor" fill="none"/>
+                    </svg>
+                  </Button>
+                  {showEmail && (
+                    <div className="mt-4 text-orange-700 font-semibold break-all">
+                      <div>palash.kuet@gmail.com</div>
+                    </div>
+                  )}
+                  <p className="text-sm text-gray-600 mt-4">
+                    Please use the above email for your e-transfer.
+                  </p>
+                </div>
+              </CardContent>
+            </Card>
             </div>
 
             {/* Search Bookings */}

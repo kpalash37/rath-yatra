@@ -7,32 +7,48 @@ import Link from "next/link"
 import { CountdownTimer } from "@/components/countdown-timer"
 import { HeroSlider } from "@/components/hero-slider"
 import { useRouter } from "next/navigation"
+import { use, useEffect, useState } from "react";
+import { getEvents } from "@/services/events.service";
 
 export default function HomePage() {
+  const [upcomingEvents, setUpcomingEvents] = useState([]);
+
   const router = useRouter()
   const handleBookingClick = (path: string) => {
     router.push(path)
   }
-  const upcomingEvents = [
-    {
-      title: "Snana Yatra",
-      date: "June 14, 2025",
-      time: "6:00 AM",
-      description: "Sacred bathing ceremony of Lord Jagannath",
-    },
-    {
-      title: "Rath Yatra Begins",
-      date: "June 28, 2025",
-      time: "7:00 AM",
-      description: "The grand chariot procession starts",
-    },
-    {
-      title: "Gundicha Yatra",
-      date: "June 28, 2025",
-      time: "2:00 PM",
-      description: "Journey to Gundicha Temple",
-    },
-  ]
+
+  useEffect(() => {
+    // Scroll to top on page load
+    const getData = async () => {
+      const data = await getEvents();
+      console.log("Fetched events data:", data[0].religious);
+      const religiousData = data[0].religious || [];
+      setUpcomingEvents(religiousData.slice(0, 3));
+    }
+    getData()
+  }, [])
+
+  // const upcomingEvents = [
+  //   {
+  //     title: "Snana Yatra",
+  //     date: "June 14, 2025",
+  //     time: "6:00 AM",
+  //     description: "Sacred bathing ceremony of Lord Jagannath",
+  //   },
+  //   {
+  //     title: "Rath Yatra Begins",
+  //     date: "June 28, 2025",
+  //     time: "7:00 AM",
+  //     description: "The grand chariot procession starts",
+  //   },
+  //   {
+  //     title: "Gundicha Yatra",
+  //     date: "June 28, 2025",
+  //     time: "2:00 PM",
+  //     description: "Journey to Gundicha Temple",
+  //   },
+  // ]
 
   const highlights = [
     {
@@ -47,8 +63,8 @@ export default function HomePage() {
     },
     {
       icon: MapPin,
-      title: "2km Route",
-      description: "From 284 Freshwater road Temple to ....",
+      title: "5km Route",
+      description: "From 284 Freshwater road to ....",
     },
     {
       icon: Heart,
@@ -94,6 +110,7 @@ export default function HomePage() {
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-orange-600 to-red-500 hover:from-red-500 hover:to-orange-600 text-white shadow-lg transform hover:scale-105 transition-all duration-200"
+                onClick={() => handleBookingClick("/live")}
                 >
                   <Play className="mr-2 h-5 w-5" />
                   Watch Live Stream
@@ -102,6 +119,7 @@ export default function HomePage() {
                   size="lg"
                   variant="outline"
                   className="border-2 border-orange-600 text-orange-600 hover:bg-orange-600 hover:text-white shadow-lg transform hover:scale-105 transition-all duration-200"
+                  onClick={() => handleBookingClick("/schedule")}
                 >
                   View Schedule
                   <ArrowRight className="ml-2 h-5 w-5" />

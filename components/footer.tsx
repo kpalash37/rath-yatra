@@ -25,7 +25,7 @@ export function Footer() {
               Experience the divine journey of Lord Jagannath, Balabhadra, and Subhadra in the most sacred festival of
               chariots.
             </p>
-            <div className="flex space-x-4">
+            {/* <div className="flex space-x-4">
               <Link
                 href="#"
                 className="text-gray-300 hover:text-orange-600 transition-colors transform hover:scale-110 duration-200"
@@ -50,7 +50,7 @@ export function Footer() {
               >
                 <Youtube className="h-5 w-5" />
               </Link>
-            </div>
+            </div> */}
           </div>
 
           {/* Quick Links */}
@@ -85,8 +85,8 @@ export function Footer() {
               <Link href="/prasadam" className="block text-gray-300 hover:text-orange-600 transition-colors">
                 Prasadam Distribution
               </Link>
-              <Link href="/safety" className="block text-gray-300 hover:text-orange-600 transition-colors">
-                Safety Guidelines
+              <Link href="/tasks" className="block text-gray-300 hover:text-orange-600 transition-colors">
+                Task Guidelines
               </Link>
             </div>
           </div>
@@ -117,13 +117,15 @@ export function Footer() {
 
         <div className="border-t border-gray-700 mt-8 pt-8 text-center">
           <p className="text-gray-300">
-            © 2025 Rath Yatra Festival. All rights reserved. |
-            <Link href="/privacy" className="text-orange-600 hover:text-red-400 hover:underline ml-1 transition-colors">
-              Privacy Policy
-            </Link>{" "}
-            |
-            <Link href="/terms" className="text-orange-600 hover:text-red-400 hover:underline ml-1 transition-colors">
-              Terms of Service
+            © 2025 Rath Yatra Festival. St. John's, NL. All rights reserved. |
+            <Link
+              href="https://techexpan.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-orange-600 hover:text-red-400 hover:underline ml-1 transition-colors"
+            >
+              Developed by{" "}
+              <span className="font-semibold">Tech Expan</span>
             </Link>
           </p>
         </div>
